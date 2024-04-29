@@ -4,7 +4,9 @@ import {
   validateFramesMessage,
 } from "@airstack/frog";
 import { Frog, Button } from "frog";
-import { handle } from 'frog/vercel'
+import { devtools as devtoolsAirstack } from "@airstack/frog/dev";
+import { serveStatic } from "@airstack/frog/serve-static";
+import { handle } from 'frog/vercel';
 import { positive } from "../lib/positive.js";
 import { Box, Heading, Text, VStack, vars } from "../lib/ui.js";
 import redis from "../lib/redis.js";
@@ -180,6 +182,8 @@ app.frame("/positive", async (c) => {
     intents: [<Button.Reset>⬅️ Back</Button.Reset>],
   });
 });
+
+devtoolsAirstack(airstack, { serveStatic });
 
 // Uncomment for local server testing
 // devtools(app, { serveStatic });
