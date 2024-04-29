@@ -13,7 +13,7 @@ const NEYNAR_API_KEY = process.env.NEYNAR_API_KEY ?? "";
 const neynarClient = new NeynarAPIClient(NEYNAR_API_KEY);
 
 const ADD_URL =
-  "https://warpcast.com/~/add-cast-action?url=https://upthumbs.app/api/upthumb";
+  "https://warpcast.com/~/add-cast-action?url=https://positive-actions.vercel.app/api/positive";
 
 export const app = new Frog({
   assetsPath: "/",
@@ -31,7 +31,7 @@ export const app = new Frog({
 // Cast action GET handler
 app.hono.get("/positive", async (c) => {
   return c.json({
-    name: "Positive Action",
+    name: "Positive Action ❤️",
     icon: "heart",
     description: "Spread positivity and love with positive actions.",
     aboutUrl: "https://github.com/Mr94t3z/positive-actions",
