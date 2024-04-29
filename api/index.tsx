@@ -1,15 +1,16 @@
 import {
-  Frog,
   getFarcasterUserDetails,
   validateFramesMessage,
 } from "@airstack/frog";
-import { Button } from "frog";
-import { devtools } from "@airstack/frog/dev";
-import { serveStatic } from "@airstack/frog/serve-static";
-import { handle } from "@airstack/frog/vercel";
+import { Frog, Button } from "frog";
+import { handle } from 'frog/vercel'
 import { positive } from "../lib/positive.js";
 import { Box, Heading, Text, VStack, vars } from "../lib/ui.js";
 import redis from "../lib/redis.js";
+
+// Uncomment this packages to tested on local server
+// import { devtools } from 'frog/dev';
+// import { serveStatic } from 'frog/serve-static';
 
 const ADD_URL =
   "https://warpcast.com/~/add-cast-action?url=https://positive-actions.vercel.app/api/positive";
@@ -18,7 +19,7 @@ export const app = new Frog({
   assetsPath: "/",
   basePath: "/api",
   ui: { vars },
-  apiKey: process.env.AIRSTACK_API_KEY as string,
+  secret: process.env.AIRSTACK_API_KEY as string,
   browserLocation: ADD_URL,
 });
 
@@ -27,7 +28,7 @@ app.hono.get("/positive", async (c) => {
   return c.json({
     name: "Positive",
     icon: "heart",
-    description: "Spread positivity and love with positive actions.",
+    description: "Spread positivity and love with positive actions by @0x94t3z",
     aboutUrl: "https://github.com/Mr94t3z/positive-actions",
     action: {
       type: "post",
@@ -144,7 +145,7 @@ app.frame("/positive", async (c) => {
   const body = await c.req.json();
 
   const { message } = await validateFramesMessage(body);
-  
+
   const fid = message?.data?.fid as number;
   let positive = "0";
   try {
@@ -174,7 +175,8 @@ app.frame("/positive", async (c) => {
   });
 });
 
-devtools(app, { serveStatic });
+// Uncomment for local server testing
+// devtools(app, { serveStatic });
 
-export const GET = handle(app);
-export const POST = handle(app);
+export const GET = handle(app)
+export const POST = handle(app)

@@ -11,12 +11,6 @@ export const { Box, Heading, Text, VStack, vars } = createSystem({
       {
         name: "Space Mono",
         source: "google",
-        weight: 400,
-      },
-      {
-        name: "Space Mono",
-        source: "google",
-        weight: 600,
       },
     ],
   },
