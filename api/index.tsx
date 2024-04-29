@@ -83,7 +83,7 @@ app.frame("/", (c) => {
         border="1em solid rgb(138, 99, 210)"
       >
         <VStack gap="4">
-          <Heading color="fcPurple" align="center" size="64">
+          <Heading color="fcPurple" align="center" size="32">
             Spread Positive ❤️
           </Heading>
         </VStack>
@@ -115,22 +115,22 @@ app.frame("/leaderboard", async (c) => {
       <Box
         grow
         alignVertical="center"
-        backgroundColor="white"
+        backgroundColor="background"
         padding="32"
-        border="1em solid rgb(138, 99, 210)"
+        border="1em solid white"
       >
         <VStack gap="4">
-          <Heading color="fcPurple" align="center" size="48">
+          <Heading color="white" align="center" size="48">
             Leaderboard
           </Heading>
           <Box>
-            <Text align="left" size="32">
+            <Text align="left" size="24">
               🥇 {firstName}: {firstScore}
             </Text>
-            <Text align="left" size="32">
+            <Text align="left" size="24">
               🥈 {secondName}: {secondScore}
             </Text>
-            <Text align="left" size="32">
+            <Text align="left" size="24">
               🥉 {thirdName}: {thirdScore}
             </Text>
           </Box>
@@ -157,12 +157,12 @@ app.frame("/me", async (c) => {
       <Box
         grow
         alignVertical="center"
-        backgroundColor="white"
+        backgroundColor="background"
         padding="32"
-        border="1em solid rgb(138, 99, 210)"
+        border="1em solid white"
       >
         <VStack gap="4">
-          <Heading color="fcPurple" align="center" size="48">
+          <Heading color="white" align="center" size="48">
             Your Positive:
           </Heading>
           <Text align="center" size="32">
