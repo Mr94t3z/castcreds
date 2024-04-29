@@ -80,7 +80,7 @@ app.frame("/", (c) => {
         alignVertical="center"
         backgroundColor="white"
         padding="32"
-        border="1em solid rgb(138, 99, 210)"
+        border="1em solid rgb(71,42,145)"
       >
         <VStack gap="4">
           <Heading color="fcPurple" align="center" size="32">
@@ -115,23 +115,23 @@ app.frame("/leaderboard", async (c) => {
       <Box
         grow
         alignVertical="center"
-        backgroundColor="background"
+        backgroundColor="white"
         padding="32"
-        border="1em solid white"
+        border="1em solid rgb(71,42,145)"
       >
         <VStack gap="4">
-          <Heading color="white" align="center" size="48">
+          <Heading color="fcPurple" align="center" size="48">
             Leaderboard
           </Heading>
           <Box>
             <Text align="left" size="24">
-              🥇 {firstName}: {firstScore}
+              🥇 @{firstName}: {firstScore}
             </Text>
             <Text align="left" size="24">
-              🥈 {secondName}: {secondScore}
+              🥈 @{secondName}: {secondScore}
             </Text>
             <Text align="left" size="24">
-              🥉 {thirdName}: {thirdScore}
+              🥉 @{thirdName}: {thirdScore}
             </Text>
           </Box>
         </VStack>
@@ -142,14 +142,12 @@ app.frame("/leaderboard", async (c) => {
 });
 
 app.frame("/me", async (c) => {
-  const body = await c.req.json();
-
-  const { message } = await validateFramesMessage(body);
-
-  const fid = message?.data?.fid as number;
+  const { frameData } = c;
+  const { fid } = frameData as unknown as { buttonIndex?: number; fid?: string };
+  
   let positive = "0";
   try {
-    positive = (await redis.zscore("positive", fid)) ?? "0";
+    positive = (await redis.zscore("positive", fid as string)) ?? "0";
   } catch (e) {}
 
   return c.res({
@@ -157,12 +155,12 @@ app.frame("/me", async (c) => {
       <Box
         grow
         alignVertical="center"
-        backgroundColor="background"
+        backgroundColor="white"
         padding="32"
-        border="1em solid white"
+        border="1em solid rgb(71,42,145)"
       >
         <VStack gap="4">
-          <Heading color="white" align="center" size="48">
+          <Heading color="fcPurple" align="center" size="48">
             Your Positive:
           </Heading>
           <Text align="center" size="32">
