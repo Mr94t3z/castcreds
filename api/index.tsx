@@ -1,16 +1,15 @@
-import { Button, Frog } from "frog";
-import { devtools } from "frog/dev";
-import { serveStatic } from "frog/serve-static";
-import { neynar as neynarHub } from "frog/hubs";
-import { neynar } from "frog/middlewares";
-import { handle } from "frog/vercel";
-import { CastParamType, NeynarAPIClient } from "@neynar/nodejs-sdk";
+import {
+  Frog,
+  getFarcasterUserDetails,
+  validateFramesMessage,
+} from "@airstack/frog";
+import { Button } from "frog";
+import { devtools } from "@airstack/frog/dev";
+import { serveStatic } from "@airstack/frog/serve-static";
+import { handle } from "@airstack/frog/vercel";
 import { positive } from "../lib/positive.js";
 import { Box, Heading, Text, VStack, vars } from "../lib/ui.js";
 import redis from "../lib/redis.js";
-
-const NEYNAR_API_KEY = process.env.NEYNAR_API_KEY ?? "";
-const neynarClient = new NeynarAPIClient(NEYNAR_API_KEY);
 
 const ADD_URL =
   "https://warpcast.com/~/add-cast-action?url=https://positive-actions.vercel.app/api/positive";
@@ -19,19 +18,14 @@ export const app = new Frog({
   assetsPath: "/",
   basePath: "/api",
   ui: { vars },
-  hub: neynarHub({ apiKey: NEYNAR_API_KEY }),
+  apiKey: process.env.AIRSTACK_API_KEY as string,
   browserLocation: ADD_URL,
-}).use(
-  neynar({
-    apiKey: NEYNAR_API_KEY,
-    features: ["interactor", "cast"],
-  })
-);
+});
 
 // Cast action GET handler
 app.hono.get("/positive", async (c) => {
   return c.json({
-    name: "Positive Action ❤️",
+    name: "Positive",
     icon: "heart",
     description: "Spread positivity and love with positive actions.",
     aboutUrl: "https://github.com/Mr94t3z/positive-actions",
@@ -43,26 +37,27 @@ app.hono.get("/positive", async (c) => {
 
 // Cast action POST handler
 app.hono.post("/positive", async (c) => {
-  const {
-    trustedData: { messageBytes },
-  } = await c.req.json();
+  const body = await c.req.json();
 
-  const result = await neynarClient.validateFrameAction(messageBytes);
-  if (result.valid) {
-    const cast = await neynarClient.lookUpCastByHashOrWarpcastUrl(
-      result.action.cast.hash,
-      CastParamType.Hash
-    );
-    const {
-      cast: {
-        author: { fid, username },
-      },
-    } = cast;
-    if (result.action.interactor.fid === fid) {
+  const { isValid, message } = await validateFramesMessage(body);
+  const interactorFid = message?.data?.fid;
+  const castFid = message?.data.frameActionBody.castId?.fid as number;
+  if (isValid) {
+    if (interactorFid === castFid) {
       return c.json({ message: "Nice try." }, 400);
     }
 
-    await positive(fid, username);
+    const { data, error } = await getFarcasterUserDetails({
+      fid: castFid,
+    });
+
+    if (error) {
+      return c.json({ message: "Error. Try Again." }, 500);
+    }
+
+    const username = data?.profileName || '';
+
+    await positive(castFid, username);
 
     let message = `You positive ${username}`;
     if (message.length > 30) {
@@ -98,7 +93,7 @@ app.frame("/", (c) => {
       <Button value="leaderboard" action="/leaderboard">
         🏆 Leaderboard
       </Button>,
-      <Button value="start" action="/upthumbs">
+      <Button value="start" action="/positive">
         ❤️ My Positive
       </Button>,
     ],
@@ -106,7 +101,7 @@ app.frame("/", (c) => {
 });
 
 app.frame("/leaderboard", async (c) => {
-  const leaders = await redis.zrevrange("upthumbs", 0, 3, "WITHSCORES");
+  const leaders = await redis.zrevrange("positive", 0, 3, "WITHSCORES");
   const [firstFid, firstScore, secondFid, secondScore, thirdFid, thirdScore] =
     leaders;
 
@@ -145,11 +140,15 @@ app.frame("/leaderboard", async (c) => {
   });
 });
 
-app.frame("/upthumbs", async (c) => {
-  const fid = c.var.interactor?.fid ?? 0;
-  let upthumbs = "0";
+app.frame("/positive", async (c) => {
+  const body = await c.req.json();
+
+  const { message } = await validateFramesMessage(body);
+  
+  const fid = message?.data?.fid as number;
+  let positive = "0";
   try {
-    upthumbs = (await redis.zscore("upthumbs", fid)) ?? "0";
+    positive = (await redis.zscore("positive", fid)) ?? "0";
   } catch (e) {}
 
   return c.res({
@@ -163,10 +162,10 @@ app.frame("/upthumbs", async (c) => {
       >
         <VStack gap="4">
           <Heading color="fcPurple" align="center" size="48">
-            Your Upthumbs:
+            Your Positive:
           </Heading>
           <Text align="center" size="32">
-            {upthumbs}
+            {positive}
           </Text>
         </VStack>
       </Box>
@@ -175,10 +174,7 @@ app.frame("/upthumbs", async (c) => {
   });
 });
 
-// @ts-ignore
-const isEdgeFunction = typeof EdgeFunction !== "undefined";
-const isProduction = isEdgeFunction || (import.meta as any).env?.MODE !== "development";
-devtools(app, isProduction ? { assetsPath: "/.frog" } : { serveStatic });
+devtools(app, { serveStatic });
 
 export const GET = handle(app);
 export const POST = handle(app);
