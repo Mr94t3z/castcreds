@@ -10,7 +10,6 @@
   "dependencies": {
     "@airstack/frames": "^1.1.5",
     "@airstack/frog": "^0.0.10",
-    "@neynar/nodejs-sdk": "^1.20.1",
     "dotenv": "^16.4.5",
     "frog": "latest",
     "hono": "^4.2.9",
