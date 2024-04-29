@@ -1,4 +1,5 @@
 import {
+  Frog as Airstack,
   getFarcasterUserDetails,
   validateFramesMessage,
 } from "@airstack/frog";
@@ -15,16 +16,21 @@ import redis from "../lib/redis.js";
 const ADD_URL =
   "https://warpcast.com/~/add-cast-action?url=https://positive-actions.vercel.app/api/positive";
 
+export const airstack = new Airstack({
+  apiKey: process.env.AIRSTACK_API_KEY as string,
+  basePath: "/api",
+  browserLocation: ADD_URL,
+});
+
 export const app = new Frog({
   assetsPath: "/",
   basePath: "/api",
   ui: { vars },
-  secret: process.env.AIRSTACK_API_KEY as string,
   browserLocation: ADD_URL,
 });
 
 // Cast action GET handler
-app.hono.get("/positive", async (c) => {
+airstack.hono.get("/positive", async (c) => {
   return c.json({
     name: "Positive",
     icon: "heart",
@@ -37,7 +43,7 @@ app.hono.get("/positive", async (c) => {
 });
 
 // Cast action POST handler
-app.hono.post("/positive", async (c) => {
+airstack.hono.post("/positive", async (c) => {
   const body = await c.req.json();
 
   const { isValid, message } = await validateFramesMessage(body);
