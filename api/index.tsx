@@ -94,7 +94,7 @@ app.frame("/", (c) => {
       <Button value="leaderboard" action="/leaderboard">
         🏆 Leaderboard
       </Button>,
-      <Button value="start" action="/positive">
+      <Button value="start" action="/me">
         ❤️ My Positive
       </Button>,
     ],
