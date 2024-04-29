@@ -4,14 +4,12 @@ import {
   validateFramesMessage,
 } from "@airstack/frames";
 import { Frog, Button } from "frog";
+import { devtools } from "frog/dev";
+import { serveStatic } from "frog/serve-static";
 import { handle } from 'frog/vercel';
 import { positive } from "../lib/positive.js";
 import { Box, Heading, Text, VStack, vars } from "../lib/ui.js";
 import redis from "../lib/redis.js";
-
-// Uncomment this packages to tested on local server
-// import { devtools } from 'frog/dev';
-// import { serveStatic } from 'frog/serve-static';
 
 const ADD_URL =
   "https://warpcast.com/~/add-cast-action?url=https://positive-actions.vercel.app/api/positive";
@@ -62,7 +60,7 @@ app.hono.post("/positive", async (c) => {
 
     await positive(castFid, username);
 
-    let message = `You positive ${username}`;
+    let message = `You positive @${username}`;
     if (message.length > 30) {
       message = "Positive!";
     }
@@ -143,7 +141,7 @@ app.frame("/leaderboard", async (c) => {
   });
 });
 
-app.frame("/positive", async (c) => {
+app.frame("/me", async (c) => {
   const body = await c.req.json();
 
   const { message } = await validateFramesMessage(body);
@@ -177,8 +175,10 @@ app.frame("/positive", async (c) => {
   });
 });
 
-// Uncomment for local server testing
-// devtools(app, { serveStatic });
+// @ts-ignore
+const isEdgeFunction = typeof EdgeFunction !== "undefined";
+const isProduction = isEdgeFunction || (import.meta as any).env?.MODE !== "development";
+devtools(app, isProduction ? { assetsPath: "/.frog" } : { serveStatic });
 
-export const GET = handle(app)
-export const POST = handle(app)
+export const GET = handle(app);
+export const POST = handle(app);
