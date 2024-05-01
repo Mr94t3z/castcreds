@@ -11,6 +11,10 @@ import { repped } from "../lib/repped.js";
 import { negged } from "../lib/negged.js";
 import { Box, Heading, Text, VStack, vars } from "../lib/ui.js";
 import redis from "../lib/redis.js";
+import dotenv from 'dotenv';
+
+// Load environment variables from .env file
+dotenv.config();
 
 const REPPED_URL =
   "https://warpcast.com/~/add-cast-action?url=https://castcreds.vercel.app/api/repped";
