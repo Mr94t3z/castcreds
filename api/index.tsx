@@ -38,7 +38,7 @@ app.hono.get("/repped", async (c) => {
   return c.json({
     name: "Repped Creds",
     icon: "heart",
-    description: "Repped Creds by @@injustcuz and @0x94t3z",
+    description: "Repped Creds by @injustcuz and @0x94t3z",
     aboutUrl: "https://github.com/Mr94t3z/castcreds",
     action: {
       type: "post",
@@ -86,7 +86,7 @@ app.hono.get("/negged", async (c) => {
   return c.json({
     name: "Negged Creds",
     icon: "eye-closed",
-    description: "Negged Creds by @@injustcuz and @0x94t3z",
+    description: "Negged Creds by @injustcuz and @0x94t3z",
     aboutUrl: "https://github.com/Mr94t3z/castcreds",
     action: {
       type: "post",
