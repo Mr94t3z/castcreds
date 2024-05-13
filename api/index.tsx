@@ -214,8 +214,8 @@ app.frame('/castcreed/:castFid/from/:fromFid', async (c) => {
         </Box>
       ),
       intents: [
-        <Button value='repped'>Repped</Button>,
-        <Button value='negged'>Negged</Button>,
+        <Button value='repped'>Repped (+)</Button>,
+        <Button value='negged'>Negged (-)</Button>,
       ],
     });
   } catch (error) {
