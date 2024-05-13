@@ -84,7 +84,7 @@ app.castAction(
 
     return c.frame({ path: `/castcreed/${castFid}/from/${fromFid}`})
   }, 
-  { name: "Castcred +/-", icon: "log", description: "Reputation weighted scale as an action bar by @injustcuz and @0x94t3z"}
+  { name: "Castcred", icon: "log", description: "Reputation weighted scale as an action bar by @injustcuz and @0x94t3z"}
 )
 
 app.frame('/castcreed/:castFid/from/:fromFid', async (c) => {
@@ -106,7 +106,7 @@ app.frame('/castcreed/:castFid/from/:fromFid', async (c) => {
                 Nice Try
               </Heading>
               <Spacer size="16" />
-              <Text align="center" size="18">
+              <Text align="center" color="green" size="18">
                 You can't rep/neg cred on yourself.
               </Text>
               <Spacer size="22" />
@@ -149,7 +149,7 @@ app.frame('/castcreed/:castFid/from/:fromFid', async (c) => {
                 Castcred
               </Heading>
               <Spacer size="16" />
-              <Text align="center" size="18">
+              <Text align="center" color="red" size="18">
                 Repped cred for @{username} successfully!
               </Text>
               <Spacer size="22" />
