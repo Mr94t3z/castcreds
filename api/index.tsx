@@ -82,7 +82,7 @@ app.castAction(
 
     return c.frame({ path: `/castcreed/${castFid}/from/${fromFid}`})
   }, 
-  { name: "Castcred", icon: "zap", description: "Reputation weighted scale as an action bar by @injustcuz and @0x94t3z"}
+  { name: "Castcred", icon: "log", description: "Reputation weighted scale as an action bar by @injustcuz and @0x94t3z"}
 )
 
 app.frame('/castcreed/:castFid/from/:fromFid', async (c) => {
