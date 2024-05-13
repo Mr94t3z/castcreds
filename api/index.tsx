@@ -1,132 +1,34 @@
-import {
-  init,
-  getFarcasterUserDetails,
-  validateFramesMessage,
-} from "@airstack/frames";
-import { Frog, Button } from "frog";
-import { devtools } from "frog/dev";
-import { serveStatic } from "frog/serve-static";
-import { handle } from 'frog/vercel';
+// import {
+//   init,
+//   getFarcasterUserDetails,
+//   validateFramesMessage,
+// } from "@airstack/frames";
+import { Button, Frog} from 'frog'
+import { handle } from 'frog/vercel'
 import { repped } from "../lib/repped.js";
 import { negged } from "../lib/negged.js";
 import { Box, Heading, Text, VStack, vars } from "../lib/ui.js";
 import redis from "../lib/redis.js";
 import dotenv from 'dotenv';
 
+// Uncomment this packages to tested on local server
+// import { devtools } from 'frog/dev';
+// import { serveStatic } from 'frog/serve-static';
+
 // Load environment variables from .env file
 dotenv.config();
 
-const REPPED_URL =
-  "https://warpcast.com/~/add-cast-action?url=https://castcreds.vercel.app/api/repped";
-
-const NEGGED_URL =
-  "https://warpcast.com/~/add-cast-action?url=https://castcreds.vercel.app/api/negged";
-
 const CHANNEL_URL = "https://warpcast.com/~/channel/castcred";
 
-init(process.env.AIRSTACK_API_KEY as string);
+const baseUrlNeynarV2 = process.env.BASE_URL_NEYNAR_V2;
+
+// init(process.env.AIRSTACK_API_KEY as string);
 
 export const app = new Frog({
   assetsPath: "/",
   basePath: "/api",
   ui: { vars },
   browserLocation: 'https://github.com/Mr94t3z/castcreds',
-});
-
-// Cast action GET handler for repped
-app.hono.get("/repped", async (c) => {
-  return c.json({
-    name: "Repped Creds",
-    icon: "heart",
-    description: "Repped Creds by @injustcuz and @0x94t3z",
-    aboutUrl: "https://github.com/Mr94t3z/castcreds",
-    action: {
-      type: "post",
-    },
-  });
-});
-
-// Cast action POST handler for repped
-app.hono.post("/repped", async (c) => {
-  const body = await c.req.json();
-
-  const { isValid, message } = await validateFramesMessage(body);
-  const interactorFid = message?.data?.fid;
-  const castFid = message?.data.frameActionBody.castId?.fid as number;
-  if (isValid) {
-    if (interactorFid === castFid) {
-      return c.json({ message: "Nice try." }, 400);
-    }
-
-    const { data, error } = await getFarcasterUserDetails({
-      fid: castFid,
-    });
-
-    if (error) {
-      return c.json({ message: "Error. Try Again." }, 500);
-    }
-
-    const username = data?.profileName || '';
-
-    await repped(castFid, username);
-
-    let message = `You repped @${username}`;
-    if (message.length > 30) {
-      message = "Repped!";
-    }
-
-    return c.json({ message });
-  } else {
-    return c.json({ message: "Unauthorized" }, 401);
-  }
-});
-
-// Cast action GET handler for negged
-app.hono.get("/negged", async (c) => {
-  return c.json({
-    name: "Negged Creds",
-    icon: "eye-closed",
-    description: "Negged Creds by @injustcuz and @0x94t3z",
-    aboutUrl: "https://github.com/Mr94t3z/castcreds",
-    action: {
-      type: "post",
-    },
-  });
-});
-
-// Cast action POST handler for negged
-app.hono.post("/negged", async (c) => {
-  const body = await c.req.json();
-
-  const { isValid, message } = await validateFramesMessage(body);
-  const interactorFid = message?.data?.fid;
-  const castFid = message?.data.frameActionBody.castId?.fid as number;
-  if (isValid) {
-    if (interactorFid === castFid) {
-      return c.json({ message: "Nice try." }, 400);
-    }
-
-    const { data, error } = await getFarcasterUserDetails({
-      fid: castFid,
-    });
-
-    if (error) {
-      return c.json({ message: "Error. Try Again." }, 500);
-    }
-
-    const username = data?.profileName || '';
-
-    await negged(castFid, username);
-
-    let message = `You negged @${username}`;
-    if (message.length > 30) {
-      message = "Negged!";
-    }
-
-    return c.json({ message });
-  } else {
-    return c.json({ message: "Unauthorized" }, 401);
-  }
 });
 
 // Frame handlers
@@ -154,8 +56,9 @@ app.frame("/", (c) => {
       </Box>
     ),
     intents: [
-      <Button.Link href={REPPED_URL}>⌁ Repped</Button.Link>,
-      <Button.Link href={NEGGED_URL}>⌁ Negged</Button.Link>,
+      <Button.AddCastAction action="/castcred">
+        ⎋ Install Action
+      </Button.AddCastAction>,
       <Button value="leaderboard" action="/leaderboard">
         🏆 Leaderboard
       </Button>,
@@ -165,6 +68,173 @@ app.frame("/", (c) => {
     ],
   });
 });
+
+app.castAction(
+  '/castcred',
+  (c) => {
+    // Stringify the entire castId object
+    const castId = JSON.stringify(c.actionData.castId);
+
+    // Parse the message back to an object to extract fid
+    const parsedCastId = JSON.parse(castId);
+    const castFid = parsedCastId.fid;
+    const fromFid = c.actionData.fid;
+
+    return c.frame({ path: `/castcreed/${castFid}/from/${fromFid}`})
+  }, 
+  { name: "Castcred", icon: "zap", description: "Reputation weighted scale as an action bar by @injustcuz and @0x94t3z"}
+)
+
+app.frame('/castcreed/:castFid/from/:fromFid', async (c) => {
+  const { buttonValue } = c
+  const { castFid, fromFid } = c.req.param();
+
+  if (fromFid === castFid) {
+    return c.res({
+      image: (
+          <Box
+            grow
+            alignVertical="center"
+            backgroundColor="white"
+            padding="32"
+            border="1em solid rgb(71,42,145)"
+          >
+            <VStack gap="4">
+              <Heading color="fcPurple" align="center" size="48">
+                Nice Try
+              </Heading>
+              <Text align="center" size="18">
+                You can't rep/neg cred on yourself.
+              </Text>
+              <Text decoration="underline" color="fcPurple" align="center"  size="14">
+                By @injustcuz and @0x94t3z
+              </Text>
+            </VStack>
+          </Box>
+        ),
+    });
+  }
+
+  try {
+    const response = await fetch(`${baseUrlNeynarV2}/user/bulk?fids=${castFid}`, {
+        method: 'GET',
+        headers: {
+            'accept': 'application/json',
+            'api_key': process.env.NEYNAR_API_KEY || '',
+        },
+    });
+
+    const userFarcasterData = await response.json();
+    const userData = userFarcasterData.users[0];
+
+    const username = userData.username;
+
+    if (buttonValue === 'repped') {
+      await repped(Number(castFid), username);
+      return c.res({
+        image: (
+          <Box
+            grow
+            alignVertical="center"
+            backgroundColor="white"
+            padding="32"
+            border="1em solid rgb(71,42,145)"
+          >
+            <VStack gap="4">
+              <Heading color="fcPurple" align="center" size="48">
+                Castcred
+              </Heading>
+              <Text align="center" size="18">
+                Repped cred for @{username} successfully!
+              </Text>
+              <Text decoration="underline" color="fcPurple" align="center"  size="14">
+                By @injustcuz and @0x94t3z
+              </Text>
+            </VStack>
+          </Box>
+        ),
+      });
+    } else if (buttonValue === 'negged') {
+      await negged(Number(castFid), username);
+      return c.res({
+        image: (
+          <Box
+            grow
+            alignVertical="center"
+            backgroundColor="white"
+            padding="32"
+            border="1em solid rgb(71,42,145)"
+          >
+            <VStack gap="4">
+              <Heading color="fcPurple" align="center" size="48">
+                Castcred
+              </Heading>
+              <Text align="center" size="18">
+                Negged cred for @{username} successfully!
+              </Text>
+              <Text decoration="underline" color="fcPurple" align="center"  size="14">
+                By @injustcuz and @0x94t3z
+              </Text>
+            </VStack>
+          </Box>
+        ),
+      });
+    }
+
+    return c.res({
+      image: (
+        <Box
+          grow
+          alignVertical="center"
+          backgroundColor="white"
+          padding="32"
+          border="1em solid rgb(71,42,145)"
+        >
+          <VStack gap="4">
+            <Heading color="fcPurple" align="center" size="48">
+              Castcred
+            </Heading>
+            <Text align="center" size="18">
+              Choose to rep/neg cred for @{username} 👇🏻
+            </Text>
+            <Text decoration="underline" color="fcPurple" align="center"  size="14">
+              By @injustcuz and @0x94t3z
+            </Text>
+          </VStack>
+        </Box>
+      ),
+      intents: [
+        <Button value='repped'>Repped</Button>,
+        <Button value='negged'>Negged</Button>,
+      ],
+    });
+  } catch (error) {
+    console.error("Error fetching user data:", error);
+    return c.res({
+      image: (
+        <Box
+          grow
+          alignVertical="center"
+          backgroundColor="white"
+          padding="32"
+          border="1em solid rgb(71,42,145)"
+        >
+          <VStack gap="4">
+            <Heading color="fcPurple" align="center" size="48">
+              Error
+            </Heading>
+            <Text align="center" size="18">
+              Uh oh, something went wrong. Try again.
+            </Text>
+            <Text decoration="underline" color="fcPurple" align="center"  size="14">
+              By @injustcuz and @0x94t3z
+            </Text>
+          </VStack>
+        </Box>
+    ),
+  });
+}
+})
 
 app.frame("/leaderboard", async (c) => {
   const leaders = await redis.zrevrange("score", 0, 2, "WITHSCORES");
@@ -244,10 +314,8 @@ app.frame("/my-reputation", async (c) => {
   });
 });
 
-// @ts-ignore
-const isEdgeFunction = typeof EdgeFunction !== "undefined";
-const isProduction = isEdgeFunction || (import.meta as any).env?.MODE !== "development";
-devtools(app, isProduction ? { assetsPath: "/.frog" } : { serveStatic });
+// Uncomment this line code to tested on local server
+// devtools(app, { serveStatic });
 
-export const GET = handle(app);
-export const POST = handle(app);
+export const GET = handle(app)
+export const POST = handle(app)

@@ -8,11 +8,9 @@
     "deploy": "vercel"
   },
   "dependencies": {
-    "@airstack/frames": "^1.1.5",
-    "@airstack/frog": "^0.0.10",
     "dotenv": "^16.4.5",
-    "frog": "latest",
-    "hono": "^4.2.9",
+    "frog": "^0.9.4",
+    "hono": "^4",
     "ioredis": "^5.4.1"
   },
   "devDependencies": {
