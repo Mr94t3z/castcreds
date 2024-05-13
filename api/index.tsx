@@ -7,7 +7,7 @@ import { Button, Frog} from 'frog'
 import { handle } from 'frog/vercel'
 import { repped } from "../lib/repped.js";
 import { negged } from "../lib/negged.js";
-import { Box, Heading, Text, VStack, vars } from "../lib/ui.js";
+import { Box, Heading, Text, VStack, Spacer, vars } from "../lib/ui.js";
 import redis from "../lib/redis.js";
 import dotenv from 'dotenv';
 
@@ -46,9 +46,11 @@ app.frame("/", (c) => {
           <Heading color="fcPurple" align="center" size="48">
             Castcred
           </Heading>
+          <Spacer size="16" />
           <Text align="center" size="18">
             +/- reputation weighted scale as an action bar.
           </Text>
+          <Spacer size="22" />
           <Text decoration="underline" color="fcPurple" align="center"  size="14">
             By @injustcuz and @0x94t3z
           </Text>
@@ -103,9 +105,11 @@ app.frame('/castcreed/:castFid/from/:fromFid', async (c) => {
               <Heading color="fcPurple" align="center" size="48">
                 Nice Try
               </Heading>
+              <Spacer size="16" />
               <Text align="center" size="18">
                 You can't rep/neg cred on yourself.
               </Text>
+              <Spacer size="22" />
               <Text decoration="underline" color="fcPurple" align="center"  size="14">
                 By @injustcuz and @0x94t3z
               </Text>
@@ -144,9 +148,11 @@ app.frame('/castcreed/:castFid/from/:fromFid', async (c) => {
               <Heading color="fcPurple" align="center" size="48">
                 Castcred
               </Heading>
+              <Spacer size="16" />
               <Text align="center" size="18">
                 Repped cred for @{username} successfully!
               </Text>
+              <Spacer size="22" />
               <Text decoration="underline" color="fcPurple" align="center"  size="14">
                 By @injustcuz and @0x94t3z
               </Text>
@@ -169,9 +175,11 @@ app.frame('/castcreed/:castFid/from/:fromFid', async (c) => {
               <Heading color="fcPurple" align="center" size="48">
                 Castcred
               </Heading>
+              <Spacer size="16" />
               <Text align="center" size="18">
                 Negged cred for @{username} successfully!
               </Text>
+              <Spacer size="22" />
               <Text decoration="underline" color="fcPurple" align="center"  size="14">
                 By @injustcuz and @0x94t3z
               </Text>
@@ -194,9 +202,11 @@ app.frame('/castcreed/:castFid/from/:fromFid', async (c) => {
             <Heading color="fcPurple" align="center" size="48">
               Castcred
             </Heading>
+            <Spacer size="16" />
             <Text align="center" size="18">
               Choose to rep/neg cred for @{username} 👇🏻
             </Text>
+            <Spacer size="22" />
             <Text decoration="underline" color="fcPurple" align="center"  size="14">
               By @injustcuz and @0x94t3z
             </Text>
@@ -223,9 +233,11 @@ app.frame('/castcreed/:castFid/from/:fromFid', async (c) => {
             <Heading color="fcPurple" align="center" size="48">
               Error
             </Heading>
+            <Spacer size="16" />
             <Text align="center" size="18">
               Uh oh, something went wrong. Try again.
             </Text>
+            <Spacer size="22" />
             <Text decoration="underline" color="fcPurple" align="center"  size="14">
               By @injustcuz and @0x94t3z
             </Text>
