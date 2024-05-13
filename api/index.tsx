@@ -106,7 +106,7 @@ app.frame('/castcreed/:castFid/from/:fromFid', async (c) => {
                 Nice Try
               </Heading>
               <Spacer size="16" />
-              <Text align="center" color="green" size="18">
+              <Text align="center" size="18">
                 You can't rep/neg cred on yourself.
               </Text>
               <Spacer size="22" />
@@ -149,7 +149,7 @@ app.frame('/castcreed/:castFid/from/:fromFid', async (c) => {
                 Castcred
               </Heading>
               <Spacer size="16" />
-              <Text align="center" color="red" size="18">
+              <Text align="center" color="green" size="18">
                 Repped cred for @{username} successfully!
               </Text>
               <Spacer size="22" />
@@ -176,7 +176,7 @@ app.frame('/castcreed/:castFid/from/:fromFid', async (c) => {
                 Castcred
               </Heading>
               <Spacer size="16" />
-              <Text align="center" size="18">
+              <Text align="center" color="red" size="18">
                 Negged cred for @{username} successfully!
               </Text>
               <Spacer size="22" />
